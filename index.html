@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Newshadow · 同一台设备，另一套运行视图</title>
+  <meta name="description" content="Newshadow 是仍在开发中的免 root Android 应用多实例兼容框架：同一个应用可以运行多个分身，每个分身看到属于自己的运行视图。">
+  <meta name="theme-color" content="#f2f3f0">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="mark" href="#top" aria-label="Newshadow，回到顶部">
+        <svg class="mark-glyph" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">
+          <circle class="mg-real" cx="12" cy="12" r="8"/>
+          <circle class="mg-view" cx="22" cy="12" r="8"/>
+        </svg>
+        <span class="mark-name">Newshadow</span>
+      </a>
+
+      <button class="toc-btn" type="button" aria-expanded="false" aria-controls="toc">目录</button>
+
+      <nav class="toc" id="toc" aria-label="章节">
+        <ol>
+          <li><a href="#what"><span class="toc-no">01</span><span class="toc-label">是什么</span></a></li>
+          <li><a href="#layers"><span class="toc-no">02</span><span class="toc-label">三层</span></a></li>
+          <li><a href="#status"><span class="toc-no">03</span><span class="toc-label">状态</span></a></li>
+        </ol>
+      </nav>
+
+      <a class="state" href="#status"><span class="state-dot" aria-hidden="true"></span><span class="state-text">开发中</span></a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ============ 首屏 ============ -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="wrap">
+        <p class="meta-line rise" style="--d:.05s">
+          <span>Newshadow</span><span>Android 应用多实例</span><span>免 root</span><span>开发中</span>
+        </p>
+
+        <h1 class="title" id="hero-title">
+          <span class="t-line rise" style="--d:.15s">同一台设备，</span>
+          <span class="t-line t-line-2 rise" style="--d:.32s"><span class="t-real">另一套运行视图。</span><span class="t-ghost" aria-hidden="true">另一套运行视图。</span></span>
+        </h1>
+
+        <div class="hero-body">
+          <p class="hero-epigraph rise" style="--d:.55s"><span class="label">分身</span>没有另一副身体，<br>只有另一套所见。</p>
+          <div class="hero-copy">
+            <p class="lede rise" style="--d:.65s">Newshadow 让同一个 Android 应用在同一台设备上运行多个分身，<strong>免 root</strong>。每个分身都会看到<strong>属于自己的一套运行视图</strong>。</p>
+            <div class="actions rise" style="--d:.8s">
+              <a class="btn btn-solid" href="#layers">看它如何工作</a>
+              <a class="btn btn-line" href="#status">了解进度</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="fig fig-hero wrap">
+        <div class="fig-depth" data-depth="-0.05">
+          <!-- 宽版 -->
+          <svg class="fig-svg fig-wide" viewBox="0 0 1200 430" role="img" aria-labelledby="f1w-t f1w-d" focusable="false">
+            <title id="f1w-t">图 01：视点、投影面与实物</title>
+            <desc id="f1w-d">左侧的视点代表分身；右侧的实物代表宿主的真实进程与权限。两者之间有三块投影面，依次对应 Java、Binder 与 seccomp/native 三层。视线在每块投影面上留下一段像，表示分身所见在这三处成形。</desc>
+            <g class="fade">
+              <path class="crop" d="M8 24V8H24M1176 8H1192V24M8 406V422H24M1176 422H1192V406"/>
+              <text x="32" y="42" class="t-mono fs15">FIG. 01</text>
+              <text x="1168" y="42" class="fs15" text-anchor="end">视点 · 投影面 · 实物</text>
+            </g>
+
+            <polygon class="cone fade" style="--d:1.2s" points="90,200 1030,90 1030,310"/>
+            <line class="axis fade" style="--d:.8s" x1="114" y1="200" x2="1030" y2="200"/>
+            <path class="arc fade" style="--d:1s" d="M149.6 193A60 60 0 0 1 149.6 207"/>
+            <line class="ray draw" pathLength="1" style="--d:.45s" x1="90" y1="200" x2="1030" y2="90"/>
+            <line class="ray draw" pathLength="1" style="--d:.45s" x1="90" y1="200" x2="1030" y2="310"/>
+            <line class="ray-flow" x1="90" y1="200" x2="1030" y2="90"/>
+            <line class="ray-flow" x1="90" y1="200" x2="1030" y2="310"/>
+
+            <g class="fade" style="--d:.9s">
+              <polygon class="plane" points="361,64 379,46 379,336 361,354"/>
+              <path class="plane-grid" d="M361 84L379 66M361 114L379 96M361 144L379 126M361 174L379 156M361 204L379 186M361 234L379 216M361 264L379 246M361 294L379 276M361 324L379 306"/>
+              <text x="370" y="388" class="t-mono fs16" text-anchor="middle">01 Java</text>
+              <text x="370" y="414" class="fs17" text-anchor="middle">结构</text>
+            </g>
+            <g class="fade" style="--d:1.05s">
+              <polygon class="plane" points="611,64 629,46 629,336 611,354"/>
+              <path class="plane-grid" d="M611 84L629 66M611 114L629 96M611 144L629 126M611 174L629 156M611 204L629 186M611 234L629 216M611 264L629 246M611 294L629 276M611 324L629 306"/>
+              <text x="620" y="388" class="t-mono fs16" text-anchor="middle">02 Binder</text>
+              <text x="620" y="414" class="fs17" text-anchor="middle">身份</text>
+            </g>
+            <g class="fade" style="--d:1.2s">
+              <polygon class="plane" points="861,64 879,46 879,336 861,354"/>
+              <path class="plane-grid" d="M861 84L879 66M861 114L879 96M861 144L879 126M861 174L879 156M861 204L879 186M861 234L879 216M861 264L879 246M861 294L879 276M861 324L879 306"/>
+              <text x="870" y="388" class="t-mono fs16" text-anchor="middle">03 seccomp/native</text>
+              <text x="870" y="414" class="fs17" text-anchor="middle">文件与进程</text>
+            </g>
+
+            <g class="fade" style="--d:1.5s"><line class="img-halo" x1="370" y1="167.2" x2="370" y2="232.8"/><line class="img" x1="370" y1="167.2" x2="370" y2="232.8"/></g>
+            <g class="fade" style="--d:1.7s"><line class="img-halo" x1="620" y1="138" x2="620" y2="262"/><line class="img" x1="620" y1="138" x2="620" y2="262"/></g>
+            <g class="fade" style="--d:1.9s"><line class="img-halo" x1="870" y1="108.7" x2="870" y2="291.3"/><line class="img" x1="870" y1="108.7" x2="870" y2="291.3"/></g>
+
+            <g class="fade" style="--d:.25s">
+              <circle class="vp-ring" cx="90" cy="200" r="18"/>
+              <circle class="vp-dot" cx="90" cy="200" r="6"/>
+              <path class="vp-cross" d="M62 200H70M110 200H118M90 172V180M90 220V228"/>
+              <text x="90" y="256" class="t-strong fs19" text-anchor="middle">分身</text>
+              <text x="90" y="280" class="fs16" text-anchor="middle">视点</text>
+            </g>
+
+            <g class="fade" style="--d:.15s">
+              <polygon class="obj-top" points="1030,90 1046,76 1102,76 1086,90"/>
+              <polygon class="obj-side" points="1086,90 1102,76 1102,296 1086,310"/>
+              <rect class="obj-front" x="1030" y="90" width="56" height="220"/>
+              <text x="1066" y="344" class="t-strong fs19" text-anchor="middle">宿主进程</text>
+              <text x="1066" y="369" class="fs16" text-anchor="middle">真实的系统</text>
+            </g>
+          </svg>
+
+          <!-- 竖版 -->
+          <svg class="fig-svg fig-tall" viewBox="0 0 360 600" role="img" aria-labelledby="f1t-t f1t-d" focusable="false">
+            <title id="f1t-t">图 01：视点、投影面与实物</title>
+            <desc id="f1t-d">上方的视点代表分身；下方的实物代表宿主的真实进程。两者之间有三块投影面，编号 01 到 03，依次对应 Java、Binder 与 seccomp/native 三层。视线在每块投影面上留下一段像，表示分身所见在这三处成形。</desc>
+            <g class="fade">
+              <path class="crop" d="M8 22V8H22M338 8H352V22M8 578V592H22M338 592H352V578"/>
+              <text x="24" y="36" class="t-mono fs14">FIG. 01</text>
+            </g>
+
+            <polygon class="cone fade" style="--d:1.2s" points="180,76 110,484 250,484"/>
+            <line class="axis fade" style="--d:.8s" x1="180" y1="100" x2="180" y2="484"/>
+            <line class="ray draw" pathLength="1" style="--d:.45s" x1="180" y1="76" x2="110" y2="484"/>
+            <line class="ray draw" pathLength="1" style="--d:.45s" x1="180" y1="76" x2="250" y2="484"/>
+            <line class="ray-flow" x1="180" y1="76" x2="110" y2="484"/>
+            <line class="ray-flow" x1="180" y1="76" x2="250" y2="484"/>
+
+            <g class="fade" style="--d:.9s">
+              <polygon class="plane" points="40,204 304,204 320,188 56,188"/>
+              <path class="plane-grid" d="M64 204L80 188M92 204L108 188M120 204L136 188M148 204L164 188M176 204L192 188M204 204L220 188M232 204L248 188M260 204L276 188M288 204L304 188"/>
+              <text x="14" y="201" class="t-mono fs15">01</text>
+            </g>
+            <g class="fade" style="--d:1.05s">
+              <polygon class="plane" points="40,314 304,314 320,298 56,298"/>
+              <path class="plane-grid" d="M64 314L80 298M92 314L108 298M120 314L136 298M148 314L164 298M176 314L192 298M204 314L220 298M232 314L248 298M260 314L276 298M288 314L304 298"/>
+              <text x="14" y="311" class="t-mono fs15">02</text>
+            </g>
+            <g class="fade" style="--d:1.2s">
+              <polygon class="plane" points="40,424 304,424 320,408 56,408"/>
+              <path class="plane-grid" d="M64 424L80 408M92 424L108 408M120 424L136 408M148 424L164 408M176 424L192 408M204 424L220 408M232 424L248 408M260 424L276 408M288 424L304 408"/>
+              <text x="14" y="421" class="t-mono fs15">03</text>
+            </g>
+
+            <g class="fade" style="--d:1.5s"><line class="img-halo" x1="159.4" y1="196" x2="200.6" y2="196"/><line class="img" x1="159.4" y1="196" x2="200.6" y2="196"/></g>
+            <g class="fade" style="--d:1.7s"><line class="img-halo" x1="140.5" y1="306" x2="219.5" y2="306"/><line class="img" x1="140.5" y1="306" x2="219.5" y2="306"/></g>
+            <g class="fade" style="--d:1.9s"><line class="img-halo" x1="121.7" y1="416" x2="238.3" y2="416"/><line class="img" x1="121.7" y1="416" x2="238.3" y2="416"/></g>
+
+            <g class="fade" style="--d:.25s">
+              <circle class="vp-ring" cx="180" cy="76" r="16"/>
+              <circle class="vp-dot" cx="180" cy="76" r="5"/>
+              <path class="vp-cross" d="M156 76H164M196 76H204M180 52V60M180 92V100"/>
+              <text x="212" y="72" class="t-strong fs17">分身</text>
+              <text x="212" y="94" class="fs15">视点</text>
+            </g>
+
+            <g class="fade" style="--d:.15s">
+              <polygon class="obj-top" points="110,484 122,474 262,474 250,484"/>
+              <polygon class="obj-side" points="250,484 262,474 262,518 250,528"/>
+              <rect class="obj-front" x="110" y="484" width="140" height="44"/>
+              <text x="180" y="556" class="t-strong fs17" text-anchor="middle">宿主进程</text>
+              <text x="180" y="578" class="fs15" text-anchor="middle">真实的系统</text>
+            </g>
+          </svg>
+        </div>
+        <figcaption>
+          <p><span class="fig-id">FIG. 01</span>分身看向系统时，所见在三处成形。</p>
+          <ol class="key">
+            <li><span class="k-no">01</span>Java</li>
+            <li><span class="k-no">02</span>Binder</li>
+            <li><span class="k-no">03</span>seccomp/native</li>
+          </ol>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ 01 是什么 ============ -->
+    <section class="sec" id="what" aria-labelledby="h-what">
+      <div class="wrap">
+        <div class="sec-top reveal">
+          <p class="sec-index" aria-hidden="true"><span data-depth="-0.05">01</span></p>
+          <p class="sec-kicker">是什么</p>
+        </div>
+        <h2 class="sec-title reveal" id="h-what">一个应用，多个分身。</h2>
+
+        <div class="what-grid">
+          <ol class="traits">
+            <li class="reveal"><span class="tr-no" aria-hidden="true">01</span><h3>免 root</h3></li>
+            <li class="reveal"><span class="tr-no" aria-hidden="true">02</span><h3>多个分身</h3><p>同一个应用，在同一台设备上以多个实例运行。</p></li>
+            <li class="reveal"><span class="tr-no" aria-hidden="true">03</span><h3>各自的视图</h3><p>每个分身看到属于自己的运行视图：应用结构、身份参数、文件与进程。</p></li>
+          </ol>
+
+          <figure class="fig fig-inst reveal">
+            <svg class="fig-svg" viewBox="0 0 480 240" role="img" aria-labelledby="fi-t" focusable="false">
+              <title id="fi-t">同一个宿主，展开为三个分身的视图</title>
+              <line class="inst-axis fade" x1="40" y1="110" x2="440" y2="110"/>
+              <g class="inst inst-3"><circle class="inst-ring" cx="370" cy="110" r="52"/><text x="370" y="200" class="fs16" text-anchor="middle">分身 3</text></g>
+              <g class="inst inst-2"><circle class="inst-ring" cx="290" cy="110" r="52"/><text x="290" y="200" class="fs16" text-anchor="middle">分身 2</text></g>
+              <g class="inst inst-1"><circle class="inst-ring" cx="210" cy="110" r="52"/><text x="210" y="200" class="fs16" text-anchor="middle">分身 1</text></g>
+              <g class="inst-host">
+                <circle class="host-disc" cx="110" cy="110" r="52"/>
+                <text x="110" y="200" class="t-strong fs17" text-anchor="middle">宿主</text>
+              </g>
+            </svg>
+            <figcaption>同一个宿主，多套所见。</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02 三层 ============ -->
+    <section class="sec" id="layers" aria-labelledby="h-layers">
+      <div class="wrap">
+        <div class="sec-top reveal">
+          <p class="sec-index" aria-hidden="true"><span data-depth="-0.05">02</span></p>
+          <p class="sec-kicker">它如何工作</p>
+        </div>
+        <h2 class="sec-title reveal" id="h-layers">三层，各管一段。</h2>
+        <p class="sec-intro reveal">三层合起来，构建分身的所见。</p>
+
+        <div class="story">
+          <figure class="fig fig-story">
+            <div class="fig-panel">
+              <svg class="fig-svg" viewBox="0 0 520 776" role="img" aria-labelledby="f2-t f2-d" data-active="all" focusable="false">
+                <title id="f2-t">图 02：三层剖面</title>
+                <desc id="f2-d">自上而下的剖面。顶部是分身。三条轨道向下，依次经过 Java、Binder 与 seccomp/native 三层，分别抵达应用结构、系统服务与内核；每条轨道都有一条向下的调用线和一条向上的返回线。最底层是真实系统。</desc>
+                <defs>
+                  <pattern id="f2-tick" width="8" height="10" patternUnits="userSpaceOnUse" x="14" y="54">
+                    <line x1="0" y1=".5" x2="4" y2=".5" stroke="#0e0f10" stroke-opacity=".3"/>
+                  </pattern>
+                  <pattern id="f2-tick-l" width="8" height="50" patternUnits="userSpaceOnUse" x="14" y="54">
+                    <line x1="0" y1=".5" x2="8" y2=".5" stroke="#0e0f10" stroke-opacity=".6"/>
+                  </pattern>
+                </defs>
+
+                <g class="fade">
+                  <path class="crop" d="M6 20V6H20M500 6H514V20M6 756V770H20M500 770H514V756"/>
+                  <text x="24" y="36" class="t-mono fs15">FIG. 02</text>
+                  <text x="496" y="36" class="fs15" text-anchor="end">剖面 · 三道轨道</text>
+                  <rect x="14" y="54" width="8" height="646" fill="url(#f2-tick)"/>
+                  <rect x="14" y="54" width="8" height="646" fill="url(#f2-tick-l)"/>
+                </g>
+
+                <g class="fade" style="--d:.15s">
+                  <rect class="box box-app" x="40" y="54" width="446" height="70"/>
+                  <text x="263" y="85" class="t-strong fs20" text-anchor="middle">分身（目标应用）</text>
+                  <text x="263" y="110" class="fs16" text-anchor="middle">Java 代码与 native 代码</text>
+                </g>
+
+                <g class="bnd" data-layer="java"><g class="fade" style="--d:.3s">
+                  <line class="bnd-line" x1="40" y1="210" x2="500" y2="210"/>
+                  <text x="40" y="236" class="t-strong fs17">进程内</text>
+                </g></g>
+                <g class="bnd" data-layer="binder"><g class="fade" style="--d:.4s">
+                  <line class="bnd-line" x1="40" y1="390" x2="500" y2="390"/>
+                  <text x="40" y="416" class="t-strong fs17">进程间</text>
+                </g></g>
+                <g class="bnd" data-layer="native"><g class="fade" style="--d:.5s">
+                  <line class="bnd-line" x1="40" y1="570" x2="500" y2="570"/>
+                  <text x="40" y="596" class="t-strong fs17">系统调用</text>
+                </g></g>
+
+                <!-- 轨道 01 · Java -->
+                <g class="trk" data-layer="java">
+                  <line class="out draw" pathLength="1" style="--d:.45s" x1="190" y1="124" x2="190" y2="250"/>
+                  <line class="ret draw" pathLength="1" style="--d:.75s" x1="202" y1="250" x2="202" y2="124"/>
+                  <line class="flow flow-out" x1="190" y1="124" x2="190" y2="250"/>
+                  <line class="flow flow-ret" x1="202" y1="250" x2="202" y2="124"/>
+                  <g class="fade" style="--d:1.4s">
+                    <polygon class="arrow-o" points="186,242 194,242 190,250"/>
+                    <polygon class="arrow-r" points="198,132 206,132 202,124"/>
+                  </g>
+                  <g class="fade" style="--d:.85s">
+                    <g transform="translate(196 210)">
+                      <circle class="spin ring-spin" r="30"/>
+                      <circle class="ring-ticks" r="24"/>
+                      <circle class="ring-core" r="20"/>
+                      <circle class="ring-inner" r="14"/>
+                      <text y="5.5" class="t-mono t-strong fs15" text-anchor="middle">01</text>
+                    </g>
+                    <text x="232" y="202" class="t-mono t-strong fs18">Java</text>
+                    <text x="232" y="230" class="fs17">结构兼容</text>
+                  </g>
+                  <g class="fade" style="--d:1.05s">
+                    <rect class="box" x="140" y="250" width="112" height="60"/>
+                    <text x="196" y="286" class="t-strong fs18" text-anchor="middle">应用结构</text>
+                  </g>
+                </g>
+
+                <!-- 轨道 02 · Binder -->
+                <g class="trk" data-layer="binder">
+                  <line class="out draw" pathLength="1" style="--d:.75s" x1="324" y1="124" x2="324" y2="430"/>
+                  <line class="ret draw" pathLength="1" style="--d:1.05s" x1="336" y1="430" x2="336" y2="124"/>
+                  <line class="flow flow-out" x1="324" y1="124" x2="324" y2="430"/>
+                  <line class="flow flow-ret" x1="336" y1="430" x2="336" y2="124"/>
+                  <g class="fade" style="--d:1.8s">
+                    <polygon class="arrow-o" points="320,422 328,422 324,430"/>
+                    <polygon class="arrow-r" points="332,132 340,132 336,124"/>
+                  </g>
+                  <g class="fade" style="--d:1.15s">
+                    <g transform="translate(330 390)">
+                      <circle class="spin ring-spin" r="30"/>
+                      <circle class="ring-ticks" r="24"/>
+                      <circle class="ring-core" r="20"/>
+                      <circle class="ring-inner" r="14"/>
+                      <text y="5.5" class="t-mono t-strong fs15" text-anchor="middle">02</text>
+                    </g>
+                    <text x="294" y="382" class="t-mono t-strong fs18" text-anchor="end">Binder</text>
+                    <text x="294" y="410" class="fs17" text-anchor="end">身份参数</text>
+                  </g>
+                  <g class="fade" style="--d:1.35s">
+                    <rect class="box" x="258" y="430" width="154" height="60"/>
+                    <text x="335" y="466" class="t-strong fs18" text-anchor="middle">系统服务</text>
+                  </g>
+                </g>
+
+                <!-- 轨道 03 · seccomp/native -->
+                <g class="trk" data-layer="native">
+                  <line class="out draw" pathLength="1" style="--d:1.05s" x1="449" y1="124" x2="449" y2="610"/>
+                  <line class="ret draw" pathLength="1" style="--d:1.35s" x1="461" y1="610" x2="461" y2="124"/>
+                  <line class="flow flow-out" x1="449" y1="124" x2="449" y2="610"/>
+                  <line class="flow flow-ret" x1="461" y1="610" x2="461" y2="124"/>
+                  <g class="fade" style="--d:2.1s">
+                    <polygon class="arrow-o" points="445,602 453,602 449,610"/>
+                    <polygon class="arrow-r" points="457,132 465,132 461,124"/>
+                  </g>
+                  <g class="fade" style="--d:1.45s">
+                    <g transform="translate(455 570)">
+                      <circle class="spin ring-spin" r="30"/>
+                      <circle class="ring-ticks" r="24"/>
+                      <circle class="ring-core" r="20"/>
+                      <circle class="ring-inner" r="14"/>
+                      <text y="5.5" class="t-mono t-strong fs15" text-anchor="middle">03</text>
+                    </g>
+                    <text x="419" y="562" class="t-mono t-strong fs18" text-anchor="end">seccomp/native</text>
+                    <text x="419" y="590" class="fs17" text-anchor="end">文件与进程视图</text>
+                  </g>
+                  <g class="fade" style="--d:1.65s">
+                    <rect class="box" x="318" y="610" width="176" height="60"/>
+                    <text x="406" y="646" class="t-strong fs18" text-anchor="middle">内核</text>
+                  </g>
+                </g>
+
+                <g class="fade" style="--d:1.9s">
+                  <rect class="bed" x="14" y="700" width="492" height="62"/>
+                  <text x="260" y="726" class="t-inv-2 fs15" text-anchor="middle">真实系统</text>
+                  <text x="260" y="749" class="t-inv fs16" text-anchor="middle">宿主的实际进程与权限</text>
+                </g>
+              </svg>
+            </div>
+          </figure>
+
+          <div class="steps">
+            <article class="step" id="step-all" data-step="all" aria-labelledby="st-all">
+              <p class="step-k"><span class="step-no">00</span>总览</p>
+              <h3 id="st-all">三条轨道，由浅到深</h3>
+              <ul class="legend" aria-label="图例">
+                <li><span class="sw sw-out" aria-hidden="true"></span>调用</li>
+                <li><span class="sw sw-ret" aria-hidden="true"></span>分身看到的结果</li>
+                <li><span class="sw sw-node" aria-hidden="true"></span>Newshadow 的一层</li>
+              </ul>
+            </article>
+
+            <article class="step" id="step-java" data-step="java" aria-labelledby="st-java">
+              <p class="step-k"><span class="step-no">01</span>进程内</p>
+              <h3 id="st-java">Java 层<span>结构兼容</span></h3>
+            </article>
+
+            <article class="step" id="step-binder" data-step="binder" aria-labelledby="st-binder">
+              <p class="step-k"><span class="step-no">02</span>进程间</p>
+              <h3 id="st-binder">Binder 层<span>身份参数与返回视图</span></h3>
+            </article>
+
+            <article class="step" id="step-native" data-step="native" aria-labelledby="st-native">
+              <p class="step-k"><span class="step-no">03</span>系统调用</p>
+              <h3 id="st-native">seccomp/native 层<span>文件与进程视图</span></h3>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 03 状态 ============ -->
+    <section class="sec sec-ink" id="status" aria-labelledby="h-status">
+      <div class="wrap">
+        <div class="sec-top reveal">
+          <p class="sec-index" aria-hidden="true"><span data-depth="-0.05">03</span></p>
+          <p class="sec-kicker">状态</p>
+        </div>
+        <h2 class="statement reveal" id="h-status">
+          <span class="st-line">Newshadow</span>
+          <span class="st-line st-line-2"><span class="t-real">还在开发中。</span><span class="t-ghost" aria-hidden="true">还在开发中。</span></span>
+        </h2>
+
+        <p class="back-links reveal">
+          <a href="#layers">再看一遍三层</a>
+          <a href="#top">回到顶部</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <p class="foot-mark">
+        <svg viewBox="0 0 36 24" width="30" height="20" aria-hidden="true" focusable="false">
+          <circle class="mg-real" cx="12" cy="12" r="8"/>
+          <circle class="mg-view" cx="22" cy="12" r="8"/>
+        </svg>
+        Newshadow
+      </p>
+      <p class="foot-copy">© <span data-year>2026</span> Newshadow</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+</body>
+</html>
